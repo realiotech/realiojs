@@ -124,7 +124,7 @@ export function createTransactionWithMultipleMessages(
   sequence: number,
   accountNumber: number,
   chainId: string,
-  algo: string = ETH_SECP256K1
+  algo: string = ETH_SECP256K1,
 ) {
   const body = createBodyWithMultipleMessages(messages, memo)
   const feeMessage = createFee(fee, denom, gasLimit)
@@ -135,7 +135,7 @@ export function createTransactionWithMultipleMessages(
     new Uint8Array(pubKeyDecoded),
     sequence,
     LEGACY_AMINO,
-    algo
+    algo,
   )
 
   const authInfoAmino = createAuthInfo(signInfoAmino, feeMessage)
@@ -156,7 +156,7 @@ export function createTransactionWithMultipleMessages(
     new Uint8Array(pubKeyDecoded),
     sequence,
     SIGN_DIRECT,
-    algo
+    algo,
   )
 
   const authInfoDirect = createAuthInfo(signInfoDirect, feeMessage)
@@ -208,6 +208,89 @@ export function createTransaction(
     sequence,
     accountNumber,
     chainId,
-    algo
+    algo,
   )
+}
+
+/**
+ * Returns a transaction object with the body, authInfo and signBytes for both Amino and SignDirect
+ * @param body - The body of the transaction. Must be a valid tx.cosmos.tx.v1beta1.TxBody
+ * @param fee - The fee amount
+ * @param denom - The fee denomination
+ * @param gasLimit - The gas limit
+ * @param pubKey - The public key of the sender
+ * @param sequence - The sequence number of the sender
+ * @param accountNumber - The account number of the sender
+ * @param chainId - The chain ID
+ * @param algo - The algorithm used to sign the transaction. Defaults to ETH_SECP256K1
+ * @returns An object with the legacyAmino and signDirect properties
+ */
+export function createTransactionWithBody(
+  body: any,
+  fee: string,
+  denom: string,
+  gasLimit: number,
+  pubKey: string,
+  sequence: number,
+  accountNumber: number,
+  chainId: string,
+  algo: string = ETH_SECP256K1,
+) {
+  const feeMessage = createFee(fee, denom, gasLimit)
+  const pubKeyDecoded = Buffer.from(pubKey, 'base64')
+
+  // AMINO
+  const signInfoAmino = createSignerInfo(
+    new Uint8Array(pubKeyDecoded),
+    sequence,
+    LEGACY_AMINO,
+    algo,
+  )
+
+  const authInfoAmino = createAuthInfo(signInfoAmino, feeMessage)
+
+  const signDocAmino = createSigDoc(
+    body.serializeBinary(),
+    authInfoAmino.serializeBinary(),
+    chainId,
+    accountNumber,
+  )
+
+  const hashAmino = new Keccak(256)
+  hashAmino.update(Buffer.from(signDocAmino.serializeBinary()))
+  const toSignAmino = hashAmino.digest('binary')
+
+  // SignDirect
+  const signInfoDirect = createSignerInfo(
+    new Uint8Array(pubKeyDecoded),
+    sequence,
+    SIGN_DIRECT,
+    algo,
+  )
+
+  const authInfoDirect = createAuthInfo(signInfoDirect, feeMessage)
+
+  const signDocDirect = createSigDoc(
+    body.serializeBinary(),
+    authInfoDirect.serializeBinary(),
+    chainId,
+    accountNumber,
+  )
+
+  const hashDirect = new Keccak(256)
+  hashDirect.update(Buffer.from(signDocDirect.serializeBinary()))
+  const toSignDirect = hashDirect.digest('binary')
+
+  return {
+    legacyAmino: {
+      body,
+      authInfo: authInfoAmino,
+      signBytes: toSignAmino.toString('base64'),
+    },
+    signDirect: {
+      body,
+      authInfo: authInfoDirect,
+      signBytes: toSignDirect.toString('base64'),
+    },
+  }
 }
