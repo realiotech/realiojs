@@ -3,6 +3,7 @@ import {
   createTransaction,
   createBodyWithMultipleMessages,
   createTransactionWithBody,
+  createFee,
 } from '@realiotech/proto'
 
 import { Chain, Fee, Sender } from './common'
@@ -46,34 +47,40 @@ export function createTxMessageSend(
 }
 
 export function createMsgSendBody(
-  sender: Sender,
+  senderAddress: string,
   memo: string,
   params: MessageSendParams,
+  fee: Fee,
 ) {
   // Cosmos
   const msgSend = protoMsgSend(
-    sender.accountAddress,
+    senderAddress,
     params.destinationAddress,
     params.amount,
     params.denom,
   )
   const body = createBodyWithMultipleMessages([msgSend], memo)
-
-  return { body }
+  const feeMessage = createFee(fee.amount, fee.denom, parseInt(fee.gas, 10))
+  return { body, feeMessage }
 }
 
+/**
+ * Creates a send transaction using a prebuilt body and fee proto msg
+ * @param body expected to be tx.cosmos.tx.v1beta1.TxBody, temporarily set to any
+ * @param chain Chain
+ * @param sender Sender
+ * @param fee expected to be tx.cosmos.tx.v1beta1.Fee, temporarily set to any
+ */
 export function createSendTx(
   body: any,
   chain: Chain,
   sender: Sender,
-  fee: Fee,
+  fee: any,
 ) {
   // Cosmos
   const tx = createTransactionWithBody(
     body,
-    fee.amount,
-    fee.denom,
-    parseInt(fee.gas, 10),
+    fee,
     sender.pubkey,
     sender.sequence,
     sender.accountNumber,

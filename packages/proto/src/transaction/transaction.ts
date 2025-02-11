@@ -215,9 +215,7 @@ export function createTransaction(
 /**
  * Returns a transaction object with the body, authInfo and signBytes for both Amino and SignDirect
  * @param body - The body of the transaction. Must be a valid tx.cosmos.tx.v1beta1.TxBody
- * @param fee - The fee amount
- * @param denom - The fee denomination
- * @param gasLimit - The gas limit
+ * @param fee - The fee of the transaction. Must be a valid tx.cosmos.tx.v1beta1.Fee
  * @param pubKey - The public key of the sender
  * @param sequence - The sequence number of the sender
  * @param accountNumber - The account number of the sender
@@ -226,19 +224,15 @@ export function createTransaction(
  * @returns An object with the legacyAmino and signDirect properties
  */
 export function createTransactionWithBody(
-  body: any,
-  fee: string,
-  denom: string,
-  gasLimit: number,
+  body: tx.cosmos.tx.v1beta1.TxBody,
+  fee: tx.cosmos.tx.v1beta1.Fee,
   pubKey: string,
   sequence: number,
   accountNumber: number,
   chainId: string,
   algo: string = ETH_SECP256K1,
 ) {
-  const feeMessage = createFee(fee, denom, gasLimit)
   const pubKeyDecoded = Buffer.from(pubKey, 'base64')
-
   // AMINO
   const signInfoAmino = createSignerInfo(
     new Uint8Array(pubKeyDecoded),
@@ -247,7 +241,7 @@ export function createTransactionWithBody(
     algo,
   )
 
-  const authInfoAmino = createAuthInfo(signInfoAmino, feeMessage)
+  const authInfoAmino = createAuthInfo(signInfoAmino, fee)
 
   const signDocAmino = createSigDoc(
     body.serializeBinary(),
@@ -268,7 +262,7 @@ export function createTransactionWithBody(
     algo,
   )
 
-  const authInfoDirect = createAuthInfo(signInfoDirect, feeMessage)
+  const authInfoDirect = createAuthInfo(signInfoDirect, fee)
 
   const signDocDirect = createSigDoc(
     body.serializeBinary(),
