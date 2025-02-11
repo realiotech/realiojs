@@ -46,6 +46,15 @@ export function createTxMessageSend(
   }
 }
 
+/**
+ * Created a msg send body and fee that can be passed into a transaction builder.
+ * The returned body is of type tx.cosmos.tx.v1beta1.TxBody
+ * The returned fee is of type tx.cosmos.tx.v1beta1.Fee
+ * @param senderAddress the sender's address
+ * @param memo the memo
+ * @param params MessageSendParams
+ * @param fee Fee
+ */
 export function createMsgSendBody(
   senderAddress: string,
   memo: string,
@@ -66,6 +75,7 @@ export function createMsgSendBody(
 
 /**
  * Creates a send transaction using a prebuilt body and fee proto msg
+ * The returned object contains signDirect and legacyAmino objects
  * @param body expected to be tx.cosmos.tx.v1beta1.TxBody, temporarily set to any
  * @param chain Chain
  * @param sender Sender
