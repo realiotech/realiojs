@@ -1,4 +1,5 @@
 import * as staking from '../proto/cosmos/staking/v1beta1/tx'
+import * as multistaking from '../proto/realionetwork/multistaking/v1/tx'
 import * as coin from '../proto/cosmos/base/v1beta1/coin'
 import * as dist from '../proto/cosmos/distribution/v1beta1/tx'
 
@@ -22,6 +23,25 @@ export function createMsgDelegate(
   return {
     message,
     path: 'cosmos.staking.v1beta1.MsgDelegate',
+  }
+}
+
+export function createMsgDelegateEVM(
+  delegatorAddress: string,
+  validatorAddress: string,
+  amount: string,
+  contractAddress: string,
+) {
+  const message = new multistaking.multistaking.v1.MsgDelegateEVM({
+    delegator_address: delegatorAddress,
+    validator_address: validatorAddress,
+    contract_address: contractAddress,
+    amount: amount,
+  })
+
+  return {
+    message,
+    path: 'multistaking.v1.MsgDelegateEVM',
   }
 }
 
@@ -50,6 +70,28 @@ export function createMsgBeginRedelegate(
   }
 }
 
+export function createMsgBeginRedelegateEVM(
+  delegatorAddress: string,
+  validatorSrcAddress: string,
+  validatorDstAddress: string,
+  amount: string,
+  contractAddress: string,
+) {
+
+  const message = new multistaking.multistaking.v1.MsgBeginRedelegateEVM({
+    delegator_address: delegatorAddress,
+    validator_src_address: validatorSrcAddress,
+    validator_dst_address: validatorDstAddress,
+    amount: amount,
+    contract_address: contractAddress,
+  })
+
+  return {
+    message,
+    path: 'multistaking.v1.MsgBeginRedelegateEVM',
+  }
+}
+
 export function createMsgUndelegate(
   delegatorAddress: string,
   validatorAddress: string,
@@ -70,6 +112,26 @@ export function createMsgUndelegate(
   return {
     message,
     path: 'cosmos.staking.v1beta1.MsgUndelegate',
+  }
+}
+
+export function createMsgUndelegateEVM(
+  delegatorAddress: string,
+  validatorAddress: string,
+  amount: string,
+  contractAddress: string,
+) {
+
+  const message = new multistaking.multistaking.v1.MsgUndelegateEVM({
+    delegator_address: delegatorAddress,
+    validator_address: validatorAddress,
+    amount: amount,
+    contract_address: contractAddress,
+  })
+
+  return {
+    message,
+    path: 'multistaking.v1.MsgUndelegateEVM',
   }
 }
 
