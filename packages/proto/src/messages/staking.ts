@@ -172,3 +172,24 @@ export function createMsgWithdrawValidatorCommission(validatorAddress: string) {
     path: 'cosmos.distribution.v1beta1.MsgWithdrawValidatorCommission',
   }
 }
+
+export function createMsgCancelUnbondingEVMDelegation(
+  delegatorAddress: string,
+  validatorAddress: string,
+  contractAddress: string,
+  amount: string,
+  creationHeight: number,
+) {
+  const message = new multistaking.multistaking.v1.MsgCancelUnbondingEVMDelegation({
+    delegator_address: delegatorAddress,
+    validator_address: validatorAddress,
+    contract_address: contractAddress,
+    amount: amount,
+    creation_height: creationHeight,
+  })
+
+  return {
+    message,
+    path: 'multistaking.v1.MsgCancelUnbondingEVMDelegation',
+  }
+}
