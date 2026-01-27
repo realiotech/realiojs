@@ -4,6 +4,10 @@ import {
   createMsgUndelegate as protoMsgUndelegate,
   createMsgWithdrawDelegatorReward as protoMsgWithdrawDelegatorReward,
   createMsgWithdrawValidatorCommission as protoMsgWithdrawValidatorCommission,
+  createMsgBeginRedelegateEVM as protoMsgBeginRedelegateEVM,
+  createMsgDelegateEVM as protoMsgDelegateEVM,
+  createMsgUndelegateEVM as protoMsgUndelegateEVM,
+  createMsgCancelUnbondingEVMDelegation as protoMsgCancelUnbondingEVMDelegation,
   MsgWithdrawDelegatorRewardProtoInterface,
   createTransaction,
   createTransactionWithMultipleMessages,
@@ -214,6 +218,170 @@ export function createTxMsgWithdrawValidatorCommission(
   // Cosmos
   const protoMessage = protoMsgWithdrawValidatorCommission(
     params.validatorAddress,
+  )
+  const tx = createTransaction(
+    protoMessage,
+    memo,
+    fee.amount,
+    fee.denom,
+    parseInt(fee.gas, 10),
+    sender.pubkey,
+    sender.sequence,
+    sender.accountNumber,
+    chain.cosmosChainId,
+  )
+
+  return {
+    signDirect: tx.signDirect,
+    legacyAmino: tx.legacyAmino,
+  }
+}
+
+// EVM Multistaking Functions
+
+export interface MsgCreateEVMValidatorParams {
+  description: any
+  commission: any
+  minSelfDelegation: string
+  validatorAddress: string
+  pubkey: any
+  contractAddress: string
+  value: string
+}
+
+export interface MsgDelegateEVMParams {
+  validatorAddress: string
+  contractAddress: string
+  amount: string
+}
+
+export function createTxMsgDelegateEVM(
+  chain: Chain,
+  sender: Sender,
+  fee: Fee,
+  memo: string,
+  params: MsgDelegateEVMParams,
+) {
+  const protoMessage = protoMsgDelegateEVM(
+    sender.accountAddress,
+    params.validatorAddress,
+    params.amount,
+    params.contractAddress,
+  )
+  const tx = createTransaction(
+    protoMessage,
+    memo,
+    fee.amount,
+    fee.denom,
+    parseInt(fee.gas, 10),
+    sender.pubkey,
+    sender.sequence,
+    sender.accountNumber,
+    chain.cosmosChainId,
+  )
+
+  return {
+    signDirect: tx.signDirect,
+    legacyAmino: tx.legacyAmino,
+  }
+}
+
+export interface MsgBeginRedelegateEVMParams {
+  validatorSrcAddress: string
+  validatorDstAddress: string
+  contractAddress: string
+  amount: string
+}
+
+export function createTxMsgBeginRedelegateEVM(
+  chain: Chain,
+  sender: Sender,
+  fee: Fee,
+  memo: string,
+  params: MsgBeginRedelegateEVMParams,
+) {
+  const protoMessage = protoMsgBeginRedelegateEVM(
+    sender.accountAddress,
+    params.validatorSrcAddress,
+    params.validatorDstAddress,
+    params.amount,
+    params.contractAddress,
+  )
+  const tx = createTransaction(
+    protoMessage,
+    memo,
+    fee.amount,
+    fee.denom,
+    parseInt(fee.gas, 10),
+    sender.pubkey,
+    sender.sequence,
+    sender.accountNumber,
+    chain.cosmosChainId,
+  )
+
+  return {
+    signDirect: tx.signDirect,
+    legacyAmino: tx.legacyAmino,
+  }
+}
+
+export interface MsgUndelegateEVMParams {
+  validatorAddress: string
+  contractAddress: string
+  amount: string
+}
+
+export function createTxMsgUndelegateEVM(
+  chain: Chain,
+  sender: Sender,
+  fee: Fee,
+  memo: string,
+  params: MsgUndelegateEVMParams,
+) {
+  const protoMessage = protoMsgUndelegateEVM(
+    sender.accountAddress,
+    params.validatorAddress,
+    params.amount,
+    params.contractAddress,
+  )
+  const tx = createTransaction(
+    protoMessage,
+    memo,
+    fee.amount,
+    fee.denom,
+    parseInt(fee.gas, 10),
+    sender.pubkey,
+    sender.sequence,
+    sender.accountNumber,
+    chain.cosmosChainId,
+  )
+
+  return {
+    signDirect: tx.signDirect,
+    legacyAmino: tx.legacyAmino,
+  }
+}
+
+export interface MsgCancelUnbondingEVMDelegationParams {
+  validatorAddress: string
+  contractAddress: string
+  amount: string
+  creationHeight: number
+}
+
+export function createTxMsgCancelUnbondingEVMDelegation(
+  chain: Chain,
+  sender: Sender,
+  fee: Fee,
+  memo: string,
+  params: MsgCancelUnbondingEVMDelegationParams,
+) {
+  const protoMessage = protoMsgCancelUnbondingEVMDelegation(
+    sender.accountAddress,
+    params.validatorAddress,
+    params.contractAddress,
+    params.amount,
+    params.creationHeight,
   )
   const tx = createTransaction(
     protoMessage,
